@@ -24,16 +24,15 @@ namespace UlElement
             return value;
         }
 
-        static void DrawBar(int value, int maxValue, ConsoleColor color, int position)
+        static void DrawBar(int value, int maxValue, ConsoleColor color, int position, char symbol = '_')
         {
             ConsoleColor defaultColor = Console.BackgroundColor;
 
             string filledBar = "";
-            char filledSymbol = '#';
 
             for (int i = 0; i < value; i++)
             {
-                filledBar += filledSymbol;
+                filledBar += symbol;
             }
 
             Console.SetCursorPosition(0, position);
@@ -43,18 +42,16 @@ namespace UlElement
             Console.BackgroundColor = defaultColor;
 
             string emptyBar = "";
-            char emptySymbol = '_';
 
             for (int i = value; i < maxValue; i++)
             {
-                emptyBar += emptySymbol;
+                emptyBar += symbol;
             }
 
             Console.Write($"{emptyBar}]\n");
         }
         static void Main(string[] args)
         {
-
             Console.WriteLine("Введите процент здоровья: ");
             int percentageHealth = Convert.ToInt32(Console.ReadLine());
 
