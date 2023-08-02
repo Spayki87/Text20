@@ -9,33 +9,7 @@ namespace UlElement
 {
     internal class Program
     {
-        static void Main(string[] args)
-        {
-            int percentageHealth;
-            Console.WriteLine("Введите процент здоровья: ");
-            percentageHealth = Convert.ToInt32(Console.ReadLine());
-
-            int percentageMana;
-            Console.WriteLine("Введите процент маны: ");
-            percentageMana = Convert.ToInt32(Console.ReadLine());
-
-            int maxPercent = 100;
-
-            percentageMana = Clamp(percentageMana, 0, maxPercent);
-            percentageHealth = Clamp(percentageHealth, 0, maxPercent);
-
-            int healthBar = 20;
-            int currentHealth = healthBar * percentageHealth / maxPercent;
-            int manaBar = 20;
-            int currentMana = manaBar * percentageMana / maxPercent;
-
-            Console.WriteLine("Ваше сдоровье:");
-
-            DrawBar(currentHealth, healthBar, ConsoleColor.Green, 5);
-            DrawBar(currentMana, manaBar, ConsoleColor.Blue, 6);
-        }
-
-        private static int Clamp(int value, int min, int max)
+        static int Clamp(int value, int min, int max)
         {
             if (value < min)
             {
@@ -55,10 +29,11 @@ namespace UlElement
             ConsoleColor defaultColor = Console.BackgroundColor;
 
             string filledBar = "";
+            char filledSymbol = '#';
 
             for (int i = 0; i < value; i++)
             {
-                filledBar += "#";
+                filledBar += filledSymbol;
             }
 
             Console.SetCursorPosition(0, position);
@@ -68,13 +43,36 @@ namespace UlElement
             Console.BackgroundColor = defaultColor;
 
             string emptyBar = "";
+            char emptySymbol = '_';
 
             for (int i = value; i < maxValue; i++)
             {
-                emptyBar += '_';
+                emptyBar += emptySymbol;
             }
 
             Console.Write($"{emptyBar}]\n");
+        }
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Введите процент здоровья: ");
+            int percentageHealth = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Введите процент маны: ");
+            int percentageMana = Convert.ToInt32(Console.ReadLine());
+
+            int maxPercent = 100;
+
+            percentageMana = Clamp(percentageMana, 0, maxPercent);
+            percentageHealth = Clamp(percentageHealth, 0, maxPercent);
+
+            int healthBar = 20;
+            int currentHealth = healthBar * percentageHealth / maxPercent;
+            int manaBar = 20;
+            int currentMana = manaBar * percentageMana / maxPercent;
+
+            DrawBar(currentHealth, healthBar, ConsoleColor.Green, 5);
+            DrawBar(currentMana, manaBar, ConsoleColor.Blue, 6);
         }
     }
 }
