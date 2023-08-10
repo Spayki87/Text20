@@ -1,87 +1,164 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
-namespace UlElement
+namespace Кадровый_учет
 {
     internal class Program
     {
+
         static void Main(string[] args)
         {
-            Console.SetCursorPosition(0, 5);
-            Console.WriteLine("Введите процент здоровья: ");
-            int healthPercent = Convert.ToInt32(Console.ReadLine());
+            const string CommandAddDossier = "1";
+            const string CommandShowAllDossiers = "2";
+            const string CommandDeleteDossier = "3";
+            const string CommandSearchSurnames = "4";
+            const string CommandExit = "5";
 
-            Console.WriteLine("Введите процент маны: ");
-            int manaPercent = Convert.ToInt32(Console.ReadLine());
+            bool exitProgram = true;
 
-            int maxPercent = 100;
+            string[] fullNames = new string[0];
+            string[] posts = new string[0];
+            string userInput;
 
-            healthPercent = Clamp(healthPercent, 0, maxPercent);
-            manaPercent = Clamp(healthPercent, 0, maxPercent);
+            while (exitProgram == true)
+            {
+                Console.WriteLine($"{CommandAddDossier} - добавить досье.");
+                Console.WriteLine($"{CommandShowAllDossiers} - вывести все досье.");
+                Console.WriteLine($"{CommandDeleteDossier} - удалить досье.");
+                Console.WriteLine($"{CommandSearchSurnames} - поиск по фамилии.");
+                Console.WriteLine($"{CommandExit} - выход из программы.");
+                userInput = Console.ReadLine();
 
-            int healthBar = 10;
-            int manaBar = 10;
+                switch (userInput)
+                {
+                    case CommandAddDossier:
+                        AddDossier(ref fullNames, ref posts);
+                        break;
 
-            DrawBar(healthPercent, healthBar, maxPercent, ConsoleColor.Green, 1);
-            DrawBar(manaPercent, manaBar, maxPercent, ConsoleColor.Blue, 2);
+                    case CommandShowAllDossiers:
+                        ShowAllDossiers(fullNames, posts);
+                        break;
+
+                    case CommandDeleteDossier:
+                        DeleteDossier(ref fullNames, ref posts);
+                        break;
+
+                    case CommandSearchSurnames:
+                        SearchSurnames(fullNames, posts);
+                        break;
+
+                    case CommandExit:
+                        exitProgram = false;
+                        Console.WriteLine("Вы вышли из программы.");
+                        break;
+                }
+            }
         }
 
-        static int Clamp(int value, int min, int max)
+        static string[] IncreaseArray(string[] arrayInput, string input)
         {
-            if (value < min)
+            string[] tempArray = new string[arrayInput.Length + 1];
+
+            for (int i = 0; i < arrayInput.Length; i++)
             {
-                value = min;
-            }
-            else if (value > max)
-            {
-                value = max;
+                tempArray[i] = arrayInput[i];
             }
 
-            return value;
+            tempArray[tempArray.Length - 1] = input;
+
+            return tempArray;
         }
 
-        static void DrawBar(int percent, int barLength, int maxPercent, ConsoleColor color, int position)
+        static void AddDossier(ref string[] fullNames, ref string[] posts)
         {
-            char filledSymbol = '#';
-            char openBracket = '[';
-            char closeBracket = ']';
-            char emptySymbol = '_';
+            Console.WriteLine("Введите Фамилию Имя Отчество: ");
+            string fullName = Console.ReadLine();
 
-            string bar;
+            Console.WriteLine("Введите должность");
+            string post = Console.ReadLine();
 
-            int filledLength = barLength * percent / maxPercent;
-            int emptyLength = barLength - filledLength;
+            fullNames = IncreaseArray(fullNames, fullName);
 
-            ConsoleColor defaultColor = Console.BackgroundColor;
+            posts = IncreaseArray(posts, post);
 
-            bar = GetBar(filledLength, filledSymbol);
-
-            Console.SetCursorPosition(0, position);
-            Console.Write(openBracket);
-            Console.BackgroundColor = color;
-            Console.Write(bar);
-            Console.BackgroundColor = defaultColor;
-
-            bar = GetBar(emptyLength, emptySymbol);
-
-            Console.Write($"{bar}{closeBracket}\n");
         }
 
-        static string GetBar(int length, char symbol)
+        static void ShowAllDossiers(string[] fullNames, string[] posts)
         {
-            string bar = string.Empty;
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < fullNames.Length; i++)
             {
-                bar += symbol;
+                Console.WriteLine($"{i + 1} - {fullNames[i]} - {posts[i]}");
+            }
+        }
+
+        static string[] DecreasArray(string[] dossiers, int input)
+        {
+            string[] temp = new string[dossiers.Length - 1];
+
+            for (int i = 0; i < input - 1; i++)
+            {
+                temp[i] += dossiers[i];
             }
 
-            return bar;
+            for (int i = input; i < dossiers.Length; i++)
+            {
+                temp[i - 1] = dossiers[i];
+            }
+
+            return temp;
+        }
+
+        static void DeleteDossier(ref string[] fullNames, ref string[] posts)
+        {
+            int dossierNumber;
+
+            Console.WriteLine("Выберите номер досье, которое хотите удалить: ");
+            dossierNumber = int.Parse(Console.ReadLine());
+
+            if (dossierNumber < 1 || dossierNumber > fullNames.Length)
+            {
+                Console.WriteLine("Не правильно введен номер досье.");
+            }
+            else
+            {
+                fullNames = DecreasArray(fullNames, dossierNumber);
+
+                posts = DecreasArray(posts, dossierNumber);
+            }
+        }
+
+        static void SearchSurnames(string[] fullNames, string[] posts)
+        {
+            string input;
+
+            string[] tempFullName;
+
+            char space = ' ';
+            char delimiters = space;
+
+            bool fullNameIsFound = false;
+
+            Console.WriteLine("Введите Фамилию:");
+            input = Console.ReadLine();
+
+            for (int i = 0; i < fullNames.Length; i++)
+            {
+                tempFullName = fullNames[i].Split(delimiters);
+
+                if (input.ToLower() == tempFullName[0].ToLower())
+                {
+                    Console.WriteLine($"Ваше досье: {fullNames[i]} - {posts[i]}");
+                    fullNameIsFound = true;
+                }
+            }
+            if (fullNameIsFound == false)
+            {
+                Console.WriteLine("Такой Фамилии нет.");
+            }
         }
     }
 }
